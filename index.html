@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0D1B2A">
+<title>Team Wellness</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,sans-serif;background:#0D1B2A;color:#F0F4F8;min-height:100vh}
+.screen{display:none;min-height:100vh}
+.screen.on{display:block}
+.success-screen{display:none;min-height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center}
+.success-screen.on{display:flex}
+
+/* Header */
+.top{padding:52px 20px 16px;background:#162032;border-bottom:1px solid rgba(255,255,255,0.08)}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;margin-bottom:10px}
+.b-matin{background:rgba(59,130,246,0.2);color:#60A5FA}
+.b-seance{background:rgba(239,68,68,0.2);color:#F87171}
+.dot{width:6px;height:6px;border-radius:50%}
+.b-matin .dot{background:#60A5FA}
+.b-seance .dot{background:#F87171}
+h1{font-size:22px;font-weight:700}
+.sub{font-size:14px;color:#7A8FA6;margin-top:4px}
+
+/* Mode tabs */
+.tabs{display:flex;gap:8px;padding:16px 16px 0}
+.tab{flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:#162032;color:#7A8FA6;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.tab.t-matin{background:rgba(59,130,246,0.15);color:#60A5FA;border-color:rgba(59,130,246,0.3)}
+.tab.t-seance{background:rgba(239,68,68,0.15);color:#F87171;border-color:rgba(239,68,68,0.3)}
+
+/* Player list */
+.players{padding:12px 16px 100px;display:flex;flex-direction:column;gap:8px}
+.pcard{background:#162032;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s}
+.pcard:active{background:#1E2D42;transform:scale(0.98)}
+.av{width:40px;height:40px;border-radius:50%;background:rgba(59,130,246,0.15);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#60A5FA;flex-shrink:0}
+.pinfo{flex:1}
+.pinfo strong{font-size:14px;font-weight:600;display:block}
+.pinfo span{font-size:12px;color:#7A8FA6}
+.pstatus{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.15)}
+.pstatus.done{background:#22C55E}
+
+/* Form */
+.fheader{padding:52px 20px 16px;background:#162032;border-bottom:1px solid rgba(255,255,255,0.08)}
+.back{display:flex;align-items:center;gap:6px;color:#7A8FA6;font-size:14px;cursor:pointer;background:none;border:none;font-family:inherit;margin-bottom:16px;padding:0}
+.fplayer{display:flex;align-items:center;gap:12px}
+.fav{width:44px;height:44px;border-radius:50%;background:rgba(59,130,246,0.15);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#60A5FA}
+.fname{font-size:17px;font-weight:700}
+.fdate{font-size:13px;color:#7A8FA6;margin-top:2px}
+.fbody{padding:0 0 120px}
+
+/* Score bar */
+.scorewrap{margin:12px 16px 0;background:#162032;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 16px}
+.scorerow{display:flex;align-items:center;gap:10px}
+.scorelbl{font-size:13px;color:#7A8FA6;flex-shrink:0}
+.scoretrack{flex:1;height:8px;border-radius:4px;background:#1E2D42;overflow:hidden}
+.scorefill{height:100%;border-radius:4px;width:0%;transition:width .4s,background .3s;background:#22C55E}
+.scorenum{font-size:15px;font-weight:700;min-width:44px;text-align:right;color:#7A8FA6}
+
+.sep{padding:18px 20px 8px;font-size:11px;font-weight:700;letter-spacing:.08em;color:#7A8FA6;text-transform:uppercase}
+
+/* Item cards */
+.items{display:flex;flex-direction:column;gap:8px;padding:0 16px}
+.icard{background:#162032;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 16px}
+.itop{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.iemoji{font-size:20px;width:28px;text-align:center}
+.iname{font-size:14px;font-weight:600;flex:1}
+.ival{font-size:18px;font-weight:700;min-width:20px;text-align:center;color:#7A8FA6;transition:color .2s}
+.btns{display:flex;gap:5px}
+.wbtn{flex:1;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:#1E2D42;font-size:14px;font-weight:600;cursor:pointer;color:#7A8FA6;font-family:inherit;transition:all .12s}
+.wbtn:active{transform:scale(0.9)}
+.wbtn.s1,.wbtn.s2{background:rgba(239,68,68,0.15);color:#EF4444;border-color:rgba(239,68,68,0.3)}
+.wbtn.s3{background:rgba(245,158,11,0.15);color:#F59E0B;border-color:rgba(245,158,11,0.3)}
+.wbtn.s4,.wbtn.s5{background:rgba(34,197,94,0.15);color:#22C55E;border-color:rgba(34,197,94,0.3)}
+
+/* RPE */
+.rpewrap{padding:0 16px}
+.rpecard{background:#162032;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px}
+.rpebig{font-size:56px;font-weight:800;text-align:center;padding:8px 0;color:#7A8FA6;transition:color .2s;letter-spacing:-2px}
+.rpedesc{text-align:center;font-size:13px;color:#7A8FA6;margin-bottom:14px;min-height:18px}
+.rpegrid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:5px}
+.rpebtn{height:42px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:#1E2D42;font-size:15px;font-weight:600;cursor:pointer;color:#7A8FA6;font-family:inherit;transition:all .12s}
+.rpebtn:active{transform:scale(0.9)}
+
+/* Slider */
+.slidewrap{margin:0 16px;background:#162032;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 16px}
+.slidelbl{font-size:14px;font-weight:600;margin-bottom:10px}
+.sliderow{display:flex;align-items:center;gap:12px}
+input[type=range]{flex:1;height:4px;-webkit-appearance:none;background:#1E2D42;border-radius:2px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#3B82F6;cursor:pointer}
+.slideval{font-size:15px;font-weight:700;min-width:52px;text-align:right;color:#3B82F6}
+
+/* sRPE */
+.srpedisplay{margin:0 16px;background:#162032;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.srpelbl{font-size:14px;color:#7A8FA6}
+.srpeval{font-size:22px;font-weight:800;color:#7A8FA6;transition:color .3s}
+
+/* Note */
+.notewrap{margin:0 16px;background:#162032;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 16px}
+.notehint{font-size:12px;color:#7A8FA6;margin-bottom:6px}
+textarea{width:100%;background:transparent;border:none;outline:none;font-family:inherit;font-size:14px;color:#F0F4F8;resize:none;line-height:1.5}
+textarea::placeholder{color:#7A8FA6}
+
+/* Submit */
+.submitwrap{position:fixed;bottom:0;left:0;right:0;padding:16px 16px 32px;background:linear-gradient(0deg,#0D1B2A 70%,transparent)}
+.submitbtn{width:100%;height:52px;border:none;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.sm{background:#3B82F6;color:#fff}
+.ss{background:#EF4444;color:#fff}
+.submitbtn:disabled{opacity:0.3;cursor:not-allowed}
+.submitbtn:not(:disabled):active{transform:scale(0.97)}
+
+/* Success */
+.okicon{font-size:48px;margin-bottom:16px}
+.oktitle{font-size:22px;font-weight:700;margin-bottom:6px}
+.oksub{font-size:15px;color:#7A8FA6;margin-bottom:24px}
+.okstats{display:flex;gap:16px;background:#162032;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px;justify-content:space-around;width:100%;max-width:320px}
+.stat{text-align:center}
+.statval{font-size:24px;font-weight:800}
+.statlbl{font-size:11px;color:#7A8FA6;margin-top:2px}
+.homebtn{margin-top:20px;background:none;border:none;color:#7A8FA6;font-size:14px;cursor:pointer;font-family:inherit}
+</style>
+</head>
+<body>
+
+<div class="screen on" id="s-select">
+  <div class="top">
+    <div class="badge b-matin" id="badge"><span class="dot"></span><span id="blbl">Wellness matin</span></div>
+    <h1 id="stitle">Bonjour 👋</h1>
+    <p class="sub" id="ssub">Qui es-tu ?</p>
+  </div>
+  <div class="tabs">
+    <button class="tab t-matin" id="tab-m" onclick="setMode('matin')">☀️ Wellness matin</button>
+    <button class="tab" id="tab-s" onclick="setMode('seance')">🔥 RPE post-séance</button>
+  </div>
+  <div class="players" id="plist"></div>
+</div>
+
+<div class="screen" id="s-form">
+  <div class="fheader">
+    <button class="back" onclick="goBack()">← Retour</button>
+    <div class="fplayer">
+      <div class="fav" id="fav"></div>
+      <div><div class="fname" id="fname"></div><div class="fdate" id="fdate"></div></div>
+    </div>
+  </div>
+  <div class="fbody" id="fbody"></div>
+  <div class="submitwrap">
+    <button class="submitbtn sm" id="sbtn" disabled onclick="doSubmit()">Envoyer au staff</button>
+  </div>
+</div>
+
+<div class="success-screen" id="s-ok">
+  <div class="okicon" id="okicon"></div>
+  <div class="oktitle" id="oktitle"></div>
+  <div class="oksub" id="oksub"></div>
+  <div class="okstats" id="okstats"></div>
+  <button class="homebtn" onclick="goHome()">← Retour à l'accueil</button>
+</div>
+
+<script>
+const URL_GAS = "https://script.google.com/macros/s/AKfycbxvKLLXB7SvgFKM7ZTtykEvFnGqG73Y69iMZw8RSPZyLpYh9kVuZKUZuX_aw_6iUjl-rA/exec";
+
+const JOUEURS = [
+  "Benjamin Sene","Zakai Zeigler","Jeremy Senglin",
+  "Hugo Yimga-Moukouri","Paul Lacombe","Lucas Dussoulier",
+  "Roko Prkacin","Donta Scott","Mathis Dossou-Yovo",
+  "Mitchell Saxen","Len Shoorman","Alexandre Chassange"
+];
+const ITEMS = [
+  {k:"humeur",  l:"Humeur",             e:"😊"},
+  {k:"energie", l:"Énergie",            e:"⚡"},
+  {k:"douleur", l:"Douleur musculaire", e:"💪"},
+  {k:"alim",    l:"Alim. / Hydratation",e:"💧"},
+  {k:"stress",  l:"Stress",             e:"🧠"},
+  {k:"sommeil", l:"Sommeil",            e:"🌙"},
+];
+const RDESC = ["Repos","Très léger","Léger","Léger+","Modéré","Difficile","Difficile+","Très difficile","Très difficile+","Maximal"];
+
+let mode = "matin", player = null, wv = {}, rpe = null, duree = 75;
+
+const NOW = new Date();
+const DJ = ["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"];
+const DM = ["jan","fév","mar","avr","mai","jun","jul","aoû","sep","oct","nov","déc"];
+const DSTR = DJ[NOW.getDay()]+" "+NOW.getDate()+" "+DM[NOW.getMonth()];
+
+function ini(n){return n.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase()}
+
+function show(id){
+  document.querySelectorAll(".screen,.success-screen").forEach(s=>{s.classList.remove("on")});
+  document.getElementById(id).classList.add("on");
+}
+
+function setMode(m){
+  mode=m;
+  document.getElementById("tab-m").className="tab"+(m==="matin"?" t-matin":"");
+  document.getElementById("tab-s").className="tab"+(m==="seance"?" t-seance":"");
+  const bd=document.getElementById("badge");
+  bd.className="badge "+(m==="matin"?"b-matin":"b-seance");
+  bd.innerHTML='<span class="dot"></span><span>'+(m==="matin"?"Wellness matin":"RPE post-séance")+"</span>";
+  document.getElementById("stitle").textContent=m==="matin"?"Bonjour 👋":"Après la séance 🔥";
+  document.getElementById("ssub").textContent=m==="matin"?"Qui es-tu ?":"Comment c'était ?";
+  buildList();
+}
+
+function buildList(){
+  const pl=document.getElementById("plist");
+  pl.innerHTML="";
+  JOUEURS.forEach(j=>{
+    const done=localStorage.getItem("d_"+mode+"_"+j+"_"+NOW.toDateString());
+    const d=document.createElement("div");
+    d.className="pcard";
+    d.onclick=()=>openForm(j);
+    d.innerHTML='<div class="av">'+ini(j)+'</div><div class="pinfo"><strong>'+j+'</strong><span>'+(done?(mode==="matin"?"Wellness envoyé ✓":"RPE envoyé ✓"):"En attente")+"</span></div>"+'<div class="pstatus'+(done?" done":"")+'"></div>';
+    pl.appendChild(d);
+  });
+}
+
+function openForm(j){
+  player=j; wv={}; ITEMS.forEach(it=>wv[it.k]=0); rpe=null; duree=75;
+  document.getElementById("fav").textContent=ini(j);
+  document.getElementById("fname").textContent=j;
+  document.getElementById("fdate").textContent=DSTR+" · "+(mode==="matin"?"Matin":"Post-séance");
+  const sb=document.getElementById("sbtn");
+  sb.className="submitbtn "+(mode==="matin"?"sm":"ss");
+  sb.disabled=true;
+  buildForm();
+  show("s-form");
+}
+
+function buildForm(){
+  const fb=document.getElementById("fbody");
+  if(mode==="matin"){
+    fb.innerHTML='<div class="sep">Score wellness</div>'
+      +'<div class="scorewrap"><div class="scorerow"><span class="scorelbl">Wellness</span><div class="scoretrack"><div class="scorefill" id="sf"></div></div><span class="scorenum" id="sn">—/30</span></div></div>'
+      +'<div class="sep">Comment tu te sens ? (1 mauvais · 5 excellent)</div>'
+      +'<div class="items" id="ilist"></div>'
+      +'<div class="sep">Note pour le staff</div>'
+      +'<div class="notewrap"><div class="notehint">Douleur, blessure…</div><textarea id="note" rows="2" placeholder="Optionnel"></textarea></div>';
+    buildItems();
+  } else {
+    fb.innerHTML='<div class="sep">Durée de la séance</div>'
+      +'<div class="slidewrap"><div class="slidelbl">Durée</div><div class="sliderow"><input type="range" min="20" max="150" value="75" step="5" oninput="onDuree(this.value)"><span class="slideval" id="dv">75 min</span></div></div>'
+      +'<div class="sep">Effort perçu — RPE (0 à 9)</div>'
+      +'<div class="rpewrap"><div class="rpecard"><div class="rpebig" id="rb">—</div><div class="rpedesc" id="rd">Sélectionne ton niveau</div>'
+      +'<div class="rpegrid">'+[0,1,2,3,4].map(v=>'<button class="rpebtn" onclick="setRpe('+v+')">'+v+'</button>').join("")+'</div>'
+      +'<div class="rpegrid">'+[5,6,7,8,9].map(v=>'<button class="rpebtn" onclick="setRpe('+v+')">'+v+'</button>').join("")+'</div>'
+      +'</div></div>'
+      +'<div class="sep">Charge de séance</div>'
+      +'<div class="srpedisplay"><span class="srpelbl">RPE × Durée</span><span class="srpeval" id="sv">— UA</span></div>'
+      +'<div class="sep">Note pour le staff</div>'
+      +'<div class="notewrap"><div class="notehint">Ressenti, blessure…</div><textarea id="note" rows="2" placeholder="Optionnel"></textarea></div>';
+  }
+}
+
+function buildItems(){
+  const il=document.getElementById("ilist");
+  ITEMS.forEach(it=>{
+    const d=document.createElement("div");
+    d.className="icard";
+    d.innerHTML='<div class="itop"><span class="iemoji">'+it.e+'</span><span class="iname">'+it.l+'</span><span class="ival" id="v_'+it.k+'">—</span></div>'
+      +'<div class="btns">'+[1,2,3,4,5].map(v=>'<button class="wbtn" onclick="setW(\''+it.k+'\','+v+')">'+v+'</button>').join("")+'</div>';
+    il.appendChild(d);
+  });
+}
+
+function setW(k,v){
+  wv[k]=v;
+  document.querySelectorAll(".btns button").forEach(b=>{});
+  // Update button styles for this item
+  const card=document.querySelector('[onclick*="\''+k+'\'"]').closest(".icard");
+  card.querySelectorAll(".wbtn").forEach((b,i)=>{
+    const bv=i+1;
+    b.className="wbtn"+(bv<=v?" s"+v:"");
+  });
+  const iv=document.getElementById("v_"+k);
+  iv.textContent=v;
+  iv.style.color=v>=4?"#22C55E":v===3?"#F59E0B":"#EF4444";
+  updateScore();
+}
+
+function updateScore(){
+  const total=Object.values(wv).reduce((a,b)=>a+b,0);
+  const done=Object.values(wv).filter(v=>v>0).length;
+  const sf=document.getElementById("sf");
+  const sn=document.getElementById("sn");
+  if(sf){
+    sf.style.width=(total/30*100)+"%";
+    sf.style.background=total>=24?"#22C55E":total>=18?"#F59E0B":"#EF4444";
+    sn.textContent=done===6?total+"/30":"—/30";
+    sn.style.color=done===6?(total>=24?"#22C55E":total>=18?"#F59E0B":"#EF4444"):"#7A8FA6";
+  }
+  document.getElementById("sbtn").disabled=done<6;
+}
+
+function setRpe(v){
+  rpe=v;
+  const rb=document.getElementById("rb");
+  rb.textContent=v;
+  rb.style.color=v<=4?"#22C55E":v<=7?"#F59E0B":"#EF4444";
+  document.getElementById("rd").textContent=RDESC[v];
+  document.querySelectorAll(".rpebtn").forEach(b=>{
+    const bv=parseInt(b.textContent);
+    b.style.background=bv===v?(v<=4?"rgba(34,197,94,0.2)":v<=7?"rgba(245,158,11,0.2)":"rgba(239,68,68,0.2)"):"";
+    b.style.color=bv===v?(v<=4?"#22C55E":v<=7?"#F59E0B":"#EF4444"):"";
+    b.style.borderColor=bv===v?(v<=4?"rgba(34,197,94,0.4)":v<=7?"rgba(245,158,11,0.4)":"rgba(239,68,68,0.4)"):"";
+  });
+  document.getElementById("sbtn").disabled=false;
+  updateSrpe();
+}
+
+function onDuree(v){
+  duree=parseInt(v);
+  document.getElementById("dv").textContent=v+" min";
+  updateSrpe();
+}
+
+function updateSrpe(){
+  if(rpe===null)return;
+  const s=rpe*duree;
+  const el=document.getElementById("sv");
+  el.textContent=s+" UA";
+  el.style.color=s<300?"#60A5FA":s<=600?"#22C55E":s<=800?"#F59E0B":"#EF4444";
+}
+
+async function doSubmit(){
+  const btn=document.getElementById("sbtn");
+  btn.disabled=true; btn.textContent="Envoi…";
+  const note=document.getElementById("note")?.value||"";
+  const ts=new Date().toISOString();
+  let payload={joueur:player,date:DSTR,mode:mode,note:note,timestamp:ts};
+  let statsHTML="";
+
+  if(mode==="matin"){
+    const total=Object.values(wv).reduce((a,b)=>a+b,0);
+    const status=total>=24?"Bon":total>=18?"Attention":total>=12?"Vigilance":"Alerte";
+    const weak=ITEMS.reduce((a,b)=>wv[a.k]<=wv[b.k]?a:b).l;
+    ITEMS.forEach(it=>payload[it.k]=wv[it.k]);
+    payload.score_total=total; payload.statut=status; payload.point_faible=weak;
+    const sc=total>=24?"#22C55E":total>=18?"#F59E0B":"#EF4444";
+    statsHTML='<div class="stat"><div class="statval" style="color:'+sc+'">'+total+'</div><div class="statlbl">Score /30</div></div>'
+      +'<div class="stat"><div class="statval" style="font-size:14px;color:'+sc+'">'+status+'</div><div class="statlbl">Statut</div></div>'
+      +'<div class="stat"><div class="statval" style="font-size:12px;color:#7A8FA6">'+weak+'</div><div class="statlbl">Point faible</div></div>';
+  } else {
+    const srpe=rpe*duree;
+    payload.rpe=rpe; payload.duree=duree; payload.srpe=srpe;
+    const sc=srpe<300?"#60A5FA":srpe<=600?"#22C55E":srpe<=800?"#F59E0B":"#EF4444";
+    statsHTML='<div class="stat"><div class="statval" style="color:'+(rpe<=4?"#22C55E":rpe<=7?"#F59E0B":"#EF4444")+'">'+rpe+'</div><div class="statlbl">RPE /9</div></div>'
+      +'<div class="stat"><div class="statval">'+duree+'</div><div class="statlbl">Durée (min)</div></div>'
+      +'<div class="stat"><div class="statval" style="color:'+sc+'">'+srpe+'</div><div class="statlbl">sRPE (UA)</div></div>';
+  }
+
+  try{
+    await fetch(URL_GAS,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+  }catch(e){}
+
+  localStorage.setItem("d_"+mode+"_"+player+"_"+NOW.toDateString(),"1");
+
+  document.getElementById("okicon").textContent=mode==="matin"?"🌅":"🔥";
+  document.getElementById("oktitle").textContent=mode==="matin"?"Wellness envoyé !":"RPE envoyé !";
+  document.getElementById("oksub").textContent=player+" · "+DSTR;
+  document.getElementById("okstats").innerHTML=statsHTML;
+  show("s-ok");
+}
+
+function goBack(){show("s-select");buildList()}
+function goHome(){show("s-select");buildList()}
+
+// INIT
+buildList();
+</script>
+</body>
+</html>
